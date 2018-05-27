@@ -21,6 +21,7 @@ namespace chess {
 		bool operator==(Tuple tup) {
 			return _x == tup._x && _y == tup._y;
 		} // compares two tuples
+		
 	};
 }
 

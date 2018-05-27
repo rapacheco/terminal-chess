@@ -47,7 +47,7 @@ namespace chess {
 		char value() const;
 		void set(const char value, bool white = false);
 		bool isWhite() const;
-		void display(std::ostream&) const
+		void display(std::ostream&) const;
 		
 	};
 

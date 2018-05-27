@@ -25,6 +25,8 @@ namespace chess {
 		Tile _tiles[LENGTH][LENGTH]; // board is a collection of tiles 8x8
 		Tuple _possib[NUM]; // array to store possible movements
 		bool _white; // whether is white's or black's turn
+		int whiteScore{ 0 };
+		int blackScore{ 0 };
 
 	public:
 

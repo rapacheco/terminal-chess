@@ -48,7 +48,12 @@ namespace chess {
 				}
 				os << ind;
 			}
-			os << "|" << '\n';
+			os << "|";
+
+			if (i == 1) os << "    WHITE: " << whiteScore;
+			else if (i == 2) os << "    BLACK: " << blackScore;
+
+			os << '\n';
 			count--;
 		}
 		os << "  ---------------------------------" << '\n';
@@ -91,39 +96,74 @@ namespace chess {
 		
 		// logic for the pawn's movement
 		case 'p':
-			int a, b, c;
-			if (white) 	a = 6, b = -2, c = -1;
-			else a = 1, b = 2, c = 1;
-			
+		{
+			int a, b, c, h;
+			bool lenemy, renemy;
+			char left, right;
+
+			if (white) {
+				a = 6, b = -2, c = -1, h = -1;
+				lenemy = !_tiles[tup.y() + h][tup.x() - 1].isWhite();
+				renemy = !_tiles[tup.y() + h][tup.x() + 1].isWhite();
+			}
+			else {
+				a = 1, b = 2, c = 1, h = 1;
+				lenemy = _tiles[tup.y() + h][tup.x() - 1].isWhite();
+				renemy = _tiles[tup.y() + h][tup.x() + 1].isWhite();
+			}
+
+			left = tup.x() > 0 ? _tiles[tup.y() + h][tup.x() - 1].value() : ' ';
+			right = tup.x() < 7 ? _tiles[tup.y() + h][tup.x() + 1].value() : ' ';
+			if (left != ' ' && lenemy) {
+				_possib[counter] = Tuple(tup.x() - 1, tup.y() + h);
+				counter++;
+			}
+			if (right != ' ' && renemy) {
+				_possib[counter] = Tuple(tup.x() + 1, tup.y() - 1);
+				counter++;
+			}
 			if (tup.y() == a) {
 				_possib[counter] = Tuple(tup.x(), tup.y() + b);
 				counter++;
 			}
 			_possib[counter] = Tuple(tup.x(), tup.y() + c);
 			counter++;
-			
+
 			while (counter < NUM) {
 				_possib[counter] = Tuple(-1, -1);
 				counter++;
 			}
 			break;
-
+		}
 		// if selected tile is empty
 		default:
 			_possib[0] = Tuple();
+			break;
 		}
 
 	}
 
 	// after checking if destination is possible, moves piece (sel) to 
-	// destination (dest)
+	// destination (dest) and alters the score
 	bool Board::move(Tuple sel, Tuple dest) {
 		bool possible = false;
+		int score;
 		for (int i = 0; i < NUM; i++) {
 			if (dest == _possib[i])
 				possible = true;
 		}
 		if (possible) {
+			switch (_tiles[dest.y()][dest.x()].value()) {
+			case ' ': score = 0; break;
+			case 'p': score = 1; break;
+			case 'b': score = 3; break;
+			case 'k': score = 3; break;
+			case 'r': score = 5; break;
+			case 'q': score = 9; break;
+			case 'K': score = 500; break;
+			}
+			if (whiteTurn()) whiteScore += score;
+			else blackScore += score;
 			_tiles[dest.y()][dest.x()].set(_tiles[sel.y()][sel.x()].value(), _tiles[sel.y()][sel.x()].isWhite());
 			_tiles[sel.y()][sel.x()].set(' ');
 		}
